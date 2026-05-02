@@ -1,11 +1,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
-  namespace: chat-app
+  name: backend-service
+  namespace: chatapp
+  labels:
+    app: backend   # ✅ Must match Deployment labels
+
 spec:
+  type: ClusterIP   # ✅ Internal service (best for backend APIs)
+
   selector:
-    app: backend
+    app: backend   # ❗ MUST match backend Deployment labels exactly
+
   ports:
-  - port: 5001
-    targetPort: 5001
+    - name: http   # ✅ Good practice (optional but recommended)
+      protocol: TCP
+      port: 5001       # Service port
+      targetPort: 5001 # Container port

@@ -1,34 +1,60 @@
-apiVersion: apps/v1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: mongodb-deployment
-  namespace: chat-app
+  namespace: chatapp
+
 spec:
   replicas: 1
+
   selector:
     matchLabels:
       app: mongodb
+
   template:
     metadata:
-      name: mongodb-pod
-      namespace: chat-app
-      labels: 
+      labels:
         app: mongodb
+
     spec:
       containers:
-      - name: chatapp-mongodb
-        image: mongo:latest
+      - name: mongodb
+
+        # ❌ YOU USED latest → unsafe
+        image: mongo:6.0   # ✅ Fixed version
+
         ports:
         - containerPort: 27017
+
         env:
+        # ❌ YOU HARDCODED credentials
+        # ✅ Now using Secret
         - name: MONGO_INITDB_ROOT_USERNAME
-          value: mongoadmin
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_INITDB_ROOT_USERNAME
+
         - name: MONGO_INITDB_ROOT_PASSWORD
-          value: secret
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_INITDB_ROOT_PASSWORD
+
+        # ❌ YOU MISSED THIS → DATA WAS NOT PERSISTING
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db   # ✅ Required for MongoDB
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
       volumes:
-      - name: mongo-data
+      - name: mongodb-data
         persistentVolumeClaim:
-          claimName: mongodb-pvc   
-
-
-
+          claimName: mongodb-pvc

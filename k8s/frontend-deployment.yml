@@ -2,28 +2,43 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend-deployment
-  namespace: chat-app
+  namespace: chatapp
+
 spec:
-  replicas: 1
+  replicas: 3
+
   selector:
     matchLabels:
       app: frontend
+
   template:
     metadata:
-      name: frontend-pod
-      namespace: chat-app
-      labels: 
+      labels:
         app: frontend
+
     spec:
       containers:
       - name: chatapp-frontend
-        image: trainwithshubham/chatapp-frontend
+
+        # ⚠️ Avoid latest in production
+        image: iamsnyg/chatapp-frontend:latest
+
         ports:
         - containerPort: 80
+
         env:
         - name: NODE_ENV
-          value: production
-          
+          value: "production"
 
+        # 🔥 IMPORTANT: Backend URL
+        - name: REACT_APP_API_URL
+          value: "http://backend-service:5001"
 
-
+        # (Optional but recommended)
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "300m"
+            memory: "256Mi"

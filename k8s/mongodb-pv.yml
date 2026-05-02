@@ -1,12 +1,20 @@
-apiVersion: v1
 kind: PersistentVolume
+apiVersion: v1
 metadata:
   name: mongodb-pv
-  namespace: chat-app
+  labels:
+    app: mongodb   # ✅ Added label (BEST PRACTICE)
+
 spec:
-  accessModes:
-    - ReadWriteOnce
   capacity:
     storage: 5Gi
+
+  accessModes:
+    - ReadWriteOnce
+
+  persistentVolumeReclaimPolicy: Retain
+
+  storageClassName: local-storage
+
   hostPath:
-    path: /data
+    path: /mnt/data   # ⚠️ DEV ONLY (not for production)

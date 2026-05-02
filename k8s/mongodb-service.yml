@@ -1,11 +1,15 @@
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
-  name: mongodb
-  namespace: chat-app
+  name: mongodb-service
+  namespace: chatapp
+
 spec:
   selector:
     app: mongodb
+
   ports:
-  - port: 27017
-    targetPort: 27017
+    - port: 27017
+      targetPort: 27017
+
+  clusterIP: None   # optional (headless for DB)
